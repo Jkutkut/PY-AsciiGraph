@@ -6,7 +6,7 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/04 23:37:24 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/04 23:50:30 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,6 +37,7 @@ class AsciiGraph:
 
     DRAW = lambda point, color : f"{color}{point}{AsciiGraph.NC}"
 
+    # *********** DATA VALIDATION ***********
     @classmethod
     def _data_validation(cls, plots: list, keys: list, dy: int = 1, dx: int = 1) -> None:
         t = len(keys)
@@ -52,6 +53,41 @@ class AsciiGraph:
         Y = (max_y - min_y + 1) // dy
         return (min_y, max_y, Y)
 
+    # *********** DRAWING ***********
+    @classmethod
+    def _create_map(self, t: int, Y: int, dx: int) -> list:
+        return [list("".ljust(t * dx)) for _ in range(Y)]
+
+    @classmethod
+    def _draw_y_axis(cls, map: list, Y: int, max_y: int, dy: int) -> None:
+        for i in range(Y):
+            y_value = f"{max_y - i * dy}".center(cls.Y_SIZE)
+            map[i] = f"{y_value}{cls.TOP_CORNER}{''.join(map[i])}"
+
+    @classmethod
+    def _draw_x_axis(cls, keys: list, map: list, t: int, dx: int, hide_horizontal_axis: bool, min_value_overlap_axis: bool) -> None:
+        horizontal_line = " " if hide_horizontal_axis else cls.H_LINE
+        xaxis = "".join(["".ljust(cls.Y_SIZE)] + [cls.DOWN_CURVE_E] + [horizontal_line for _ in range(t * dx)])
+        if min_value_overlap_axis:
+            map[-1] = xaxis
+        else:
+            map.append(xaxis)
+        
+        keys = [f"{k}" for k in keys] # To str list
+        longest = max([len(k) for k in keys])
+        if dx > longest:
+            # xspace = math.ceil(longest / dx)
+            # for i in range(xspace):
+            # mapa.append(list("".ljust(cls.Y_SIZE + 1 + t * dx)))
+            axis = []
+            for i in range(t):
+                k = keys[i]
+                axis.append(k.center(dx))
+            axis = "".ljust(cls.Y_SIZE + 1) + "".join(axis)
+            map.append(axis)
+            # for i in range(xspace):
+            map[-1] = "".join(map[-1])
+
     @classmethod
     def plot(cls, plots: list, keys: list, dy: int = 1, dx: int = 1,\
             min_value_overlap_axis: bool = False,\
@@ -62,7 +98,7 @@ class AsciiGraph:
 
         min_y, max_y, Y = cls._analice_values(plots, dy)
 
-        mapa = [list("".ljust(t * dx)) for _ in range(Y)]
+        mapa = cls._create_map(t, Y, dx)
 
         # Fill plot
         for plot in plots:
@@ -105,32 +141,8 @@ class AsciiGraph:
 
                 prev = values[i]
 
-        # Y axis
-        for i in range(Y):
-            y_value = f"{max_y - i * dy}".center(cls.Y_SIZE)
-            mapa[i] = f"{y_value}{cls.TOP_CORNER}{''.join(mapa[i])}"
-        
-        # X axis
-        horizontal_line = " " if hide_horizontal_axis else cls.H_LINE
-        xaxis = "".join(["".ljust(cls.Y_SIZE)] + [cls.DOWN_CURVE_E] + [horizontal_line for _ in range(t * dx)])
-        if min_value_overlap_axis:
-            mapa[-1] = xaxis
-        else:
-            mapa.append(xaxis)
-        
-        keys = [f"{k}" for k in keys] # To str list
-        longest = max([len(k) for k in keys])
-        if dx > longest:
-            # xspace = math.ceil(longest / dx)
-            # for i in range(xspace):
-            # mapa.append(list("".ljust(cls.Y_SIZE + 1 + t * dx)))
-            axis = []
-            for i in range(t):
-                k = keys[i]
-                axis.append(k.center(dx))
-            axis = "".ljust(cls.Y_SIZE + 1) + "".join(axis)
-            mapa.append(axis)
-            # for i in range(xspace):
-            mapa[-1] = "".join(mapa[-1])
+        # X, Y axis
+        cls._draw_y_axis(mapa, Y, max_y, dy)
+        cls._draw_x_axis(keys, mapa, t, dx, hide_horizontal_axis, min_value_overlap_axis)
         
         return "\n".join(mapa)
