@@ -6,7 +6,7 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/04 23:23:06 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/04 23:37:24 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,20 +38,29 @@ class AsciiGraph:
     DRAW = lambda point, color : f"{color}{point}{AsciiGraph.NC}"
 
     @classmethod
-    def plot(cls, plots: list, keys: list, dy: int = 1, dx: int = 1,\
-            min_value_overlap_axis: bool = False,\
-            hide_horizontal_axis: bool = True) -> str:
+    def _data_validation(cls, plots: list, keys: list, dy: int = 1, dx: int = 1) -> None:
         t = len(keys)
-
         if any([len(k["values"]) != t for k in plots]):
             raise Exception("Inconsistent data")
         if dx < 1:
             raise Exception("Invalid dx")
 
+    @classmethod
+    def _analice_values(cls, plots: list, dy: int = 1) -> dict:
+        min_y = min([min(p["values"]) for p in plots])
+        max_y = max([max(p["values"]) for p in plots])
+        Y = (max_y - min_y + 1) // dy
+        return (min_y, max_y, Y)
 
-        mini = min([min(p["values"]) for p in plots])
-        maxi = max([max(p["values"]) for p in plots])
-        Y = (maxi - mini + 1) // dy
+    @classmethod
+    def plot(cls, plots: list, keys: list, dy: int = 1, dx: int = 1,\
+            min_value_overlap_axis: bool = False,\
+            hide_horizontal_axis: bool = True) -> str:
+        t = len(keys)
+
+        cls._data_validation(plots, keys, dy, dx)
+
+        min_y, max_y, Y = cls._analice_values(plots, dy)
 
         mapa = [list("".ljust(t * dx)) for _ in range(Y)]
 
@@ -64,7 +73,7 @@ class AsciiGraph:
             prev = values[0]
             for i in range(t):
                 x = i * dx
-                y = (maxi - values[i]) // dy
+                y = (max_y - values[i]) // dy
 
                 # Connection to previous point logic
                 dot = None
@@ -84,10 +93,10 @@ class AsciiGraph:
                 # value representation
                 mapa[y][x] = cls.DRAW(dot, color)
                 if connector != None:
-                    y2 = (maxi - prev) // dy
+                    y2 = (max_y - prev) // dy
                     mapa[y2][x] = cls.DRAW(connector, color)
                 for j in range(*iterator):
-                    yj = (maxi - j) // dy
+                    yj = (max_y - j) // dy
                     mapa[yj][x] = cls.DRAW(cls.V_LINE, color)
                 
                 # Horizontal spacing
@@ -98,7 +107,7 @@ class AsciiGraph:
 
         # Y axis
         for i in range(Y):
-            y_value = f"{maxi - i * dy}".center(cls.Y_SIZE)
+            y_value = f"{max_y - i * dy}".center(cls.Y_SIZE)
             mapa[i] = f"{y_value}{cls.TOP_CORNER}{''.join(mapa[i])}"
         
         # X axis
