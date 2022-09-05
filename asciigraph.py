@@ -6,7 +6,7 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/04 23:50:30 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 12:04:54 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,6 +59,46 @@ class AsciiGraph:
         return [list("".ljust(t * dx)) for _ in range(Y)]
 
     @classmethod
+    def plot_values(cls, map: list, plot: dict, t: int, max_y: int, dx: int, dy: int):
+        values = plot["values"]
+        color = cls.NC
+        if "color" in plot:
+            color = plot["color"]
+        prev = values[0]
+        for i in range(t):
+            x = i * dx
+            y = (max_y - values[i]) // dy
+
+            # Connection to previous point logic
+            dot = None
+            connector = None
+            iterator = (0, 0)
+            if prev < values[i]:
+                dot = cls.UP_CURVE_E
+                connector = cls.UP_CURVE_S
+                iterator = (prev + 1, values[i])
+            elif  prev > values[i]:
+                dot = cls.DOWN_CURVE_E
+                connector = cls.DOWN_CURVE_S
+                iterator = (values[i] + 1, prev)
+            else:
+                dot = cls.H_LINE
+
+            # value representation
+            map[y][x] = cls.DRAW(dot, color)
+            if connector != None:
+                y2 = (max_y - prev) // dy
+                map[y2][x] = cls.DRAW(connector, color)
+            for j in range(*iterator):
+                yj = (max_y - j) // dy
+                map[yj][x] = cls.DRAW(cls.V_LINE, color)
+            
+            # Horizontal spacing
+            for j in range(1, dx):
+                map[y][x + j] = cls.DRAW(cls.H_LINE, color)
+            prev = values[i]
+
+    @classmethod
     def _draw_y_axis(cls, map: list, Y: int, max_y: int, dy: int) -> None:
         for i in range(Y):
             y_value = f"{max_y - i * dy}".center(cls.Y_SIZE)
@@ -102,44 +142,7 @@ class AsciiGraph:
 
         # Fill plot
         for plot in plots:
-            values = plot["values"]
-            color = cls.NC
-            if "color" in plot:
-                color = plot["color"]
-            prev = values[0]
-            for i in range(t):
-                x = i * dx
-                y = (max_y - values[i]) // dy
-
-                # Connection to previous point logic
-                dot = None
-                connector = None
-                iterator = (0, 0)
-                if prev < values[i]:
-                    dot = cls.UP_CURVE_E
-                    connector = cls.UP_CURVE_S
-                    iterator = (prev + 1, values[i])
-                elif  prev > values[i]:
-                    dot = cls.DOWN_CURVE_E
-                    connector = cls.DOWN_CURVE_S
-                    iterator = (values[i] + 1, prev)
-                else:
-                    dot = cls.H_LINE
-
-                # value representation
-                mapa[y][x] = cls.DRAW(dot, color)
-                if connector != None:
-                    y2 = (max_y - prev) // dy
-                    mapa[y2][x] = cls.DRAW(connector, color)
-                for j in range(*iterator):
-                    yj = (max_y - j) // dy
-                    mapa[yj][x] = cls.DRAW(cls.V_LINE, color)
-                
-                # Horizontal spacing
-                for j in range(1, dx):
-                    mapa[y][x + j] = cls.DRAW(cls.H_LINE, color)
-
-                prev = values[i]
+            cls.plot_values(mapa, plot, t, max_y, dx, dy)
 
         # X, Y axis
         cls._draw_y_axis(mapa, Y, max_y, dy)
