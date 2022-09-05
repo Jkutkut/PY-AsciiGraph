@@ -6,13 +6,13 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/05 16:08:40 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 23:06:43 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import math
 
-from tools.floatRange import FloatRange
+from .tools.floatRange import FloatRange
 
 class AsciiGraph:
     '''
