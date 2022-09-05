@@ -6,7 +6,7 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/05 12:15:43 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 15:13:41 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,14 +47,15 @@ class AsciiGraph:
         t = len(keys)
         if any([len(k["values"]) != t for k in plots]):
             raise Exception("Inconsistent data")
-        if dx < 1:
-            raise Exception("Invalid dx")
+        if dx < 1 or dy != 1:
+            raise Exception("Invalid dx, dy")
+        # TODO dy > 1 or dy < 1 scales graph
 
     @classmethod
     def _analice_values(cls, plots: list, dy: int = 1) -> dict:
         min_y = min([min(p["values"]) for p in plots])
         max_y = max([max(p["values"]) for p in plots])
-        Y = (max_y - min_y + 1) // dy
+        Y = int((max_y - min_y + 1) // dy)
         return (min_y, max_y, Y)
 
     # *********** DRAWING ***********
@@ -71,7 +72,7 @@ class AsciiGraph:
         prev = values[0]
         for i in range(t):
             x = i * dx
-            y = (max_y - values[i]) // dy
+            y = int((max_y - values[i]) // dy)
 
             # Connection to previous point logic
             dot = None
@@ -91,10 +92,10 @@ class AsciiGraph:
             # value representation
             map[y][x] = cls.DRAW(dot, color)
             if connector != None:
-                y2 = (max_y - prev) // dy
+                y2 = int((max_y - prev) // dy)
                 map[y2][x] = cls.DRAW(connector, color)
             for j in range(*iterator):
-                yj = (max_y - j) // dy
+                yj = int((max_y - j) // dy)
                 map[yj][x] = cls.DRAW(cls.V_LINE, color)
             
             # Horizontal spacing
