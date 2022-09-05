@@ -6,13 +6,17 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/05 12:12:10 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 12:15:43 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import math
 
 class AsciiGraph:
+    '''
+    Class with logic to generate plots with ascii characters.
+    '''
+
     TOP_CORNER = "┼"
     V_LINE = "│"
     H_LINE = "─"
