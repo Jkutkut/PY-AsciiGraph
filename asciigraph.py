@@ -6,11 +6,13 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/05 15:13:41 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 16:08:40 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import math
+
+from tools.floatRange import FloatRange
 
 class AsciiGraph:
     '''
@@ -47,9 +49,11 @@ class AsciiGraph:
         t = len(keys)
         if any([len(k["values"]) != t for k in plots]):
             raise Exception("Inconsistent data")
-        if dx < 1 or dy != 1:
-            raise Exception("Invalid dx, dy")
-        # TODO dy > 1 or dy < 1 scales graph
+        if dx < 1:
+            raise Exception("Invalid dx")
+        if dy > 1:
+            raise Exception("Invalid dy")
+        # TODO dy > 1 scales graph
 
     @classmethod
     def _analice_values(cls, plots: list, dy: int = 1) -> dict:
@@ -81,11 +85,11 @@ class AsciiGraph:
             if prev < values[i]:
                 dot = cls.UP_CURVE_E
                 connector = cls.UP_CURVE_S
-                iterator = (prev + 1, values[i])
+                iterator = (prev + dy, values[i], dy)
             elif  prev > values[i]:
                 dot = cls.DOWN_CURVE_E
                 connector = cls.DOWN_CURVE_S
-                iterator = (values[i] + 1, prev)
+                iterator = (values[i] + dy, prev, dy)
             else:
                 dot = cls.H_LINE
 
@@ -94,7 +98,7 @@ class AsciiGraph:
             if connector != None:
                 y2 = int((max_y - prev) // dy)
                 map[y2][x] = cls.DRAW(connector, color)
-            for j in range(*iterator):
+            for j in FloatRange(*iterator):
                 yj = int((max_y - j) // dy)
                 map[yj][x] = cls.DRAW(cls.V_LINE, color)
             

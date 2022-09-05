@@ -6,12 +6,14 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/04 22:44:46 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/05 14:59:54 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 16:13:22 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 from asciigraph import AsciiGraph
 from random import randint
+
+from tools.floatRange import FloatRange
 
 if __name__ == "__main__":
 	N = 10 + 1
@@ -30,6 +32,7 @@ if __name__ == "__main__":
 			plot["color"] = COLORS[p]
 		plots.append(plot)
 
-	for dx in range(1, 5 + 1, 2):
-		print()
-		print(AsciiGraph.plot(plots, keys, dx=dx, dy=1, hide_horizontal_axis=False))
+	for dy in FloatRange(0.5, 1.5, 0.5):
+		for dx in range(1, 5 + 1, 2):
+			print()
+			print(AsciiGraph.plot(plots, keys, dx=dx, dy=dy, hide_horizontal_axis=False))
