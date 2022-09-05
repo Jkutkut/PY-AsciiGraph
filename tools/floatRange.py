@@ -6,14 +6,16 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/05 15:45:46 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/05 15:53:50 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 16:18:32 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 class FloatRange:
-    def __init__(self, start: int, end: int, delta: float = 1) -> None:
+    def __init__(self, start: int, end: int, delta: float = 1, reachEnd = False) -> None:
         self.start = start - delta
         self.end = end
+        if reachEnd:
+            self.end += delta
         if delta == 0:
             raise ValueError("Delta cannot be zero.")
         self.delta = delta
