@@ -6,7 +6,7 @@
 #    By: jre-gonz <jre-gonz@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/04 15:03:53 by jre-gonz          #+#    #+#              #
-#    Updated: 2022/09/05 12:04:54 by jre-gonz         ###   ########.fr        #
+#    Updated: 2022/09/05 12:12:10 by jre-gonz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,7 +59,7 @@ class AsciiGraph:
         return [list("".ljust(t * dx)) for _ in range(Y)]
 
     @classmethod
-    def plot_values(cls, map: list, plot: dict, t: int, max_y: int, dx: int, dy: int):
+    def _plot_values(cls, map: list, plot: dict, t: int, max_y: int, dx: int, dy: int):
         values = plot["values"]
         color = cls.NC
         if "color" in plot:
@@ -107,26 +107,25 @@ class AsciiGraph:
     @classmethod
     def _draw_x_axis(cls, keys: list, map: list, t: int, dx: int, hide_horizontal_axis: bool, min_value_overlap_axis: bool) -> None:
         horizontal_line = " " if hide_horizontal_axis else cls.H_LINE
-        xaxis = "".join(["".ljust(cls.Y_SIZE)] + [cls.DOWN_CURVE_E] + [horizontal_line for _ in range(t * dx)])
+        xaxis = "".ljust(cls.Y_SIZE) + cls.DOWN_CURVE_E + "".join([horizontal_line for _ in range(t * dx)])
+        # Add the axis into the map
         if min_value_overlap_axis:
-            map[-1] = xaxis
+            map[-1] = xaxis # Removing the last line with the axis
         else:
             map.append(xaxis)
         
         keys = [f"{k}" for k in keys] # To str list
         longest = max([len(k) for k in keys])
-        if dx > longest:
-            # xspace = math.ceil(longest / dx)
-            # for i in range(xspace):
-            # mapa.append(list("".ljust(cls.Y_SIZE + 1 + t * dx)))
-            axis = []
-            for i in range(t):
-                k = keys[i]
-                axis.append(k.center(dx))
-            axis = "".ljust(cls.Y_SIZE + 1) + "".join(axis)
-            map.append(axis)
-            # for i in range(xspace):
-            map[-1] = "".join(map[-1])
+        if dx <= longest:
+            return
+        axis = []
+        for i in range(t):
+            k = keys[i]
+            axis.append(k.center(dx))
+        axis = "".ljust(cls.Y_SIZE + 1) + "".join(axis)
+        map.append(axis)
+        # for i in range(xspace):
+        map[-1] = "".join(map[-1])
 
     @classmethod
     def plot(cls, plots: list, keys: list, dy: int = 1, dx: int = 1,\
@@ -142,7 +141,7 @@ class AsciiGraph:
 
         # Fill plot
         for plot in plots:
-            cls.plot_values(mapa, plot, t, max_y, dx, dy)
+            cls._plot_values(mapa, plot, t, max_y, dx, dy)
 
         # X, Y axis
         cls._draw_y_axis(mapa, Y, max_y, dy)
